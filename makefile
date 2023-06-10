@@ -3,12 +3,12 @@ CPP = clang++
 SRCS = $(shell find ./src -name "*.c")
 HDRS = $(shell find ./src/include -name "*.h")
 OBJS = $(patsubst %.c, %.o, $(SRCS))
-FLAGS = -O3 -ftree-vectorize
-CPPFLAGS = -O3 -std=c++17 -ftree-vectorize
+FLAGS = -g #-O3 -ftree-vectorize
+CPPFLAGS = -std=c++17 -g # -ftree-vectorize  -O3
 TARGET = main 
 TESTING_TARGET = testing
 
-all: main
+all: main testing
 
 main: $(OBJS)
 	$(CC) $(FLAGS) main.c -o $(TARGET) $(OBJS)

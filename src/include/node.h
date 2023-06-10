@@ -25,7 +25,10 @@ enum node_type {
 struct node {
 	enum node_type type;
 	KEY_TYPE key;
-	VALUE_TYPE data;
+	union {
+		VALUE_TYPE value;
+		void * pointer;
+	} data;
 };
 	
 #ifdef __cplusplus
