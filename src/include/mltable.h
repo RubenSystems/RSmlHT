@@ -13,11 +13,10 @@
 #include "config.h"
 #include "node.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-	
+
 struct mltable {
 	void * root;
 	size_t count;
@@ -33,6 +32,4 @@ void mltable_set(void *, KEY_TYPE, VALUE_TYPE);
 }
 #endif
 
-	
 #endif /* mltable_h */
-

@@ -14,12 +14,11 @@
 extern "C" {
 #endif
 
-#define KEY_TYPE uint64_t
+#define KEY_TYPE   uint64_t
 #define VALUE_TYPE uint64_t
 
 #ifdef __cplusplus
 }
 #endif
 
-	
 #endif /* config_h */

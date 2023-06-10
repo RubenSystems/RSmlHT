@@ -15,7 +15,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	
+
 void * init_table(uint32_t width);
 
 struct node * get_table_node(void *, KEY_TYPE);
@@ -24,5 +24,4 @@ struct node * get_table_node(void *, KEY_TYPE);
 }
 #endif
 
-	
 #endif /* table_h */

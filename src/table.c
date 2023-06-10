@@ -11,9 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 void * init_table(uint32_t width) {
-	size_t size = width * sizeof(struct node);
+	size_t size    = width * sizeof(struct node);
 	void * table_p = malloc(size);
 	memset(table_p, 0, size);
 	return table_p;
@@ -22,4 +21,3 @@ void * init_table(uint32_t width) {
 struct node * get_table_node(void * table, KEY_TYPE key) {
 	return table + (key * sizeof(struct node));
 }
-
