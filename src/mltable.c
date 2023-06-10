@@ -11,9 +11,11 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#define INITIAL_TABLE_WIDTH	5
+#define INITIAL_TABLE_WIDTH	6
+#define DEEP_TABLE_WIDTH 5
+#define THRESHOLD_TABLE_WIDTH 3
 #define TABLE_SIZE(WIDTH)	(2 << WIDTH)
-#define TABLE_WIDTH(LAYER)	(INITIAL_TABLE_WIDTH)
+#define TABLE_WIDTH(LAYER)	((LAYER <= THRESHOLD_TABLE_WIDTH) ? INITIAL_TABLE_WIDTH : DEEP_TABLE_WIDTH)
 #define TABLE_WIDTH_MASK(LAYER) (1 << (TABLE_WIDTH(LAYER) + 1)) - 1
 
 struct mltable init_mltable(void) {
