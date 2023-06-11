@@ -11,6 +11,7 @@
 #include <stdio.h>
 
 #include "config.h"
+#include "table.h"
 #include "node.h"
 
 #ifdef __cplusplus

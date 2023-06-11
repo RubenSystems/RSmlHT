@@ -12,10 +12,10 @@
 #include <stdlib.h>
 
 #define INITIAL_TABLE_WIDTH	6
-#define DEEP_TABLE_WIDTH 5
-#define THRESHOLD_TABLE_WIDTH 3
+#define DEEP_TABLE_WIDTH	5
+#define THRESHOLD_TABLE_WIDTH	3
 #define TABLE_SIZE(WIDTH)	(2 << WIDTH)
-#define TABLE_WIDTH(LAYER)	((LAYER <= THRESHOLD_TABLE_WIDTH) ? INITIAL_TABLE_WIDTH : DEEP_TABLE_WIDTH)
+#define TABLE_WIDTH(LAYER)	INITIAL_TABLE_WIDTH
 #define TABLE_WIDTH_MASK(LAYER) (1 << (TABLE_WIDTH(LAYER) + 1)) - 1
 
 struct mltable init_mltable(void) {
@@ -50,10 +50,7 @@ static void
 __set_helper(void * table, KEY_TYPE key, VALUE_TYPE value, uint32_t layer) {
 	struct node * ret;
 	bool	      selection = true;
-	int	      counter	= 0;
 	while (selection) {
-		if (counter > 1000)
-			exit(100);
 		ret = get_table_node(table, __layer_key(key, layer));
 
 		switch (ret->type) {

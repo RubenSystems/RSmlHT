@@ -3,6 +3,10 @@ testing.cpp
 main 
 testing
 
+CMakeLists.txt
+abseil-cpp/
+build/
+
 # Prerequisites
 *.d
 

@@ -12,9 +12,7 @@
 #include <string.h>
 
 void * init_table(uint32_t width) {
-	size_t size    = width * sizeof(struct node);
-	void * table_p = malloc(size);
-	memset(table_p, 0, size);
+	void * table_p = calloc(width, sizeof(struct node));
 	return table_p;
 }
 
