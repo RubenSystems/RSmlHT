@@ -46,48 +46,55 @@ struct node * mltable_get(void * table, KEY_TYPE key) {
 static bool equatable(KEY_TYPE a, KEY_TYPE b) {
 	return a == b;
 }
-static void
-__set_helper(void * table, KEY_TYPE key, VALUE_TYPE value, uint32_t layer) {
+
+
+static void __create_until_nonequal(uint64_t key, uint32_t layer, struct node * ret, uint64_t value) {
+	struct node * current_ret = ret;
+	void * new_table = NULL;
+	size_t lk1, lk2;
+	// in english: layer key for the inserted node == layer key for the current node.
+	while ((lk1 = __layer_key(key, layer)) == (lk2 = __layer_key(ret->key, layer))) {
+		layer += 1;
+		new_table = init_table(TABLE_SIZE(TABLE_WIDTH(layer)));
+		set_node_pointer(current_ret, 0, new_table);
+		current_ret = get_table_node(new_table, lk1);
+	}
+	// now both layer keys are !=
+	struct node * fl_new = get_table_node(new_table, lk1);
+	set_node_data(fl_new, key, value);
+	
+	struct node * fl_current = get_table_node(new_table, lk2);
+	set_node_data(fl_current, ret->key, ret->data.value);
+}
+
+static void __set_helper(void * table, KEY_TYPE key, VALUE_TYPE value, uint32_t layer) {
 	struct node * ret;
 	bool	      selection = true;
 	while (selection) {
 		ret = get_table_node(table, __layer_key(key, layer));
 
 		switch (ret->type) {
-		case NODE_NOTHING: {
-			ret->data.value = value;
-			ret->key	= key;
-			ret->type	= NODE_DATA;
-			selection	= false;
-		} break;
-		case NODE_DATA: {
-			if (equatable(key, ret->key)) {
-				ret->data.value = value;
-			} else {
-				void * new_table = init_table(
-					TABLE_SIZE(TABLE_WIDTH(layer + 1))
-				);
-
-				__set_helper(
-					new_table, ret->key, ret->data.value,
-					layer + 1
-				);
-				__set_helper(new_table, key, value, layer + 1);
-				ret->key	  = 0;
-				ret->data.pointer = new_table;
-				ret->type	  = NODE_POINTER;
+			case NODE_NOTHING: {
+				set_node_data(ret, key, value);
+				selection	= false;
+			} break;
+			case NODE_DATA: {
+				if (equatable(key, ret->key)) {
+					ret->data.value = value;
+				} else {
+					__create_until_nonequal(key, layer, ret, value);
+				}
+				selection = false;
+			} break;
+			case NODE_POINTER: {
+				table = ret->data.pointer;
+				layer++;
+				selection = false;
+			} break;
+			default: {
+				printf("SOMETHING IS BROKEN!\n");
+				exit(200);
 			}
-			selection = false;
-		} break;
-		case NODE_POINTER: {
-			table = ret->data.pointer;
-			layer++;
-			selection = false;
-		} break;
-		default: {
-			printf("SOMETHING IS BROKEN!\n");
-			exit(200);
-		}
 		}
 	}
 }

@@ -25,6 +25,11 @@ struct node {
 		void *	   pointer;
 	} data;
 };
+	
+	
+	void set_node_data(struct node * n, KEY_TYPE key, VALUE_TYPE value);
+	
+	void set_node_pointer(struct node * n, KEY_TYPE key, void * pointer);
 
 #ifdef __cplusplus
 }
