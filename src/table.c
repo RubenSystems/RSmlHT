@@ -11,7 +11,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 void * init_table(uint32_t width) {
+
 	void * table_p = calloc(width, sizeof(struct node));
 	return table_p;
 }

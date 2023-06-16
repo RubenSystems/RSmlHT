@@ -11,9 +11,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#define INITIAL_TABLE_WIDTH	6
-#define DEEP_TABLE_WIDTH	5
-#define THRESHOLD_TABLE_WIDTH	3
+#define INITIAL_TABLE_WIDTH	4
 #define TABLE_SIZE(WIDTH)	(2 << WIDTH)
 #define TABLE_WIDTH(LAYER)	INITIAL_TABLE_WIDTH
 #define TABLE_WIDTH_MASK(LAYER) (1 << (TABLE_WIDTH(LAYER) + 1)) - 1
@@ -33,11 +31,10 @@ struct node * mltable_get(void * table, KEY_TYPE key) {
 
 	while (1) {
 		ret = get_table_node(table, __layer_key(key, layer++));
-		if (ret->type == NODE_POINTER) {
-			table = ret->data.pointer;
-		} else {
+		if (ret->type != NODE_POINTER) {
 			break;
 		}
+		table = ret->data.pointer;
 	};
 
 	return ret;
@@ -48,23 +45,25 @@ static bool equatable(KEY_TYPE a, KEY_TYPE b) {
 }
 
 
-static void __create_until_nonequal(uint64_t key, uint32_t layer, struct node * ret, uint64_t value) {
-	struct node * current_ret = ret;
+static void __create_until_nonequal(uint64_t key, uint32_t layer, struct node * current_ret, uint64_t value) {
+	KEY_TYPE replacement_key = current_ret->key;
+	VALUE_TYPE replacement_value = current_ret->data.value;
 	void * new_table = NULL;
 	size_t lk1, lk2;
-	// in english: layer key for the inserted node == layer key for the current node.
-	while ((lk1 = __layer_key(key, layer)) == (lk2 = __layer_key(ret->key, layer))) {
-		layer += 1;
+	// layer key for the inserted node == layer key for the current node.
+	while ((lk1 = __layer_key(key, layer)) == (lk2 = __layer_key(replacement_key, layer))) {
 		new_table = init_table(TABLE_SIZE(TABLE_WIDTH(layer)));
 		set_node_pointer(current_ret, 0, new_table);
 		current_ret = get_table_node(new_table, lk1);
+		layer += 1;
 	}
 	// now both layer keys are !=
 	struct node * fl_new = get_table_node(new_table, lk1);
 	set_node_data(fl_new, key, value);
 	
 	struct node * fl_current = get_table_node(new_table, lk2);
-	set_node_data(fl_current, ret->key, ret->data.value);
+//	printf("KEY:: %i", ret->key);
+	set_node_data(fl_current, replacement_key, replacement_value);
 }
 
 static void __set_helper(void * table, KEY_TYPE key, VALUE_TYPE value, uint32_t layer) {
@@ -89,11 +88,10 @@ static void __set_helper(void * table, KEY_TYPE key, VALUE_TYPE value, uint32_t 
 			case NODE_POINTER: {
 				table = ret->data.pointer;
 				layer++;
-				selection = false;
 			} break;
 			default: {
 				printf("SOMETHING IS BROKEN!\n");
-				exit(200);
+				exit(-1);
 			}
 		}
 	}
