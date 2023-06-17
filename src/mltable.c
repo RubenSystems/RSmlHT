@@ -11,22 +11,18 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#define INITIAL_TABLE_WIDTH	4
-#define TABLE_SIZE(WIDTH)	(2 << WIDTH)
-#define TABLE_WIDTH(LAYER)	INITIAL_TABLE_WIDTH
-#define TABLE_WIDTH_MASK(LAYER) (1 << (TABLE_WIDTH(LAYER) + 1)) - 1
 
 struct mltable init_mltable(void) {
-	struct mltable ret = { init_table(TABLE_SIZE(INITIAL_TABLE_WIDTH)), 0 };
+	struct mltable ret = { init_table(), 0 };
 	return ret;
 }
 
 static size_t __layer_key(KEY_TYPE key, uint32_t layer) {
-	return TABLE_WIDTH_MASK(layer) & (key >> (layer * TABLE_WIDTH(layer)));
+	return TABLE_WIDTH_MASK & (key >> (layer * TABLE_WIDTH));
 }
 
-struct node * mltable_get(void * table, KEY_TYPE key) {
-	struct node * ret;
+struct node * mltable_get(struct table * table, KEY_TYPE key) {
+	struct node * ret = NULL;
 	int	      layer = 0;
 
 	while (1) {
@@ -45,32 +41,32 @@ static bool equatable(KEY_TYPE a, KEY_TYPE b) {
 }
 
 
-static void __create_until_nonequal(uint64_t key, uint32_t layer, struct node * current_ret, uint64_t value) {
+static void __create_until_nonequal(uint64_t key, uint32_t layer, size_t lk1, struct node * current_ret, uint64_t value) {
 	KEY_TYPE replacement_key = current_ret->key;
 	VALUE_TYPE replacement_value = current_ret->data.value;
-	void * new_table = NULL;
-	size_t lk1, lk2;
+	struct table * new_table = NULL;
+	size_t lk2;
 	// layer key for the inserted node == layer key for the current node.
-	while ((lk1 = __layer_key(key, layer)) == (lk2 = __layer_key(replacement_key, layer))) {
-		new_table = init_table(TABLE_SIZE(TABLE_WIDTH(layer)));
-		set_node_pointer(current_ret, 0, new_table);
-		current_ret = get_table_node(new_table, lk1);
+	do {
 		layer += 1;
-	}
-	// now both layer keys are !=
-	struct node * fl_new = get_table_node(new_table, lk1);
-	set_node_data(fl_new, key, value);
+		new_table = init_table();
+		set_node_pointer(current_ret, 0, new_table);
+		current_ret = get_table_node(new_table, (lk1 = __layer_key(key, layer)));
+	} while (lk1 == (lk2 = __layer_key(replacement_key, layer)));
+	// TODO: OPTIMISE use current_ret instead of fl_new -
+	// struct node * fl_new = get_table_node(new_table, lk1);
+	set_node_data(current_ret, key, value);
 	
 	struct node * fl_current = get_table_node(new_table, lk2);
-//	printf("KEY:: %i", ret->key);
 	set_node_data(fl_current, replacement_key, replacement_value);
 }
 
-static void __set_helper(void * table, KEY_TYPE key, VALUE_TYPE value, uint32_t layer) {
+static void __set_helper(struct table * table, KEY_TYPE key, VALUE_TYPE value, uint32_t layer) {
 	struct node * ret;
 	bool	      selection = true;
+	size_t layer_key;
 	while (selection) {
-		ret = get_table_node(table, __layer_key(key, layer));
+		ret = get_table_node(table, (layer_key = __layer_key(key, layer)));
 
 		switch (ret->type) {
 			case NODE_NOTHING: {
@@ -81,7 +77,7 @@ static void __set_helper(void * table, KEY_TYPE key, VALUE_TYPE value, uint32_t 
 				if (equatable(key, ret->key)) {
 					ret->data.value = value;
 				} else {
-					__create_until_nonequal(key, layer, ret, value);
+					__create_until_nonequal(key, layer, layer_key, ret, value);
 				}
 				selection = false;
 			} break;
@@ -97,6 +93,6 @@ static void __set_helper(void * table, KEY_TYPE key, VALUE_TYPE value, uint32_t 
 	}
 }
 
-void mltable_set(void * table, KEY_TYPE key, VALUE_TYPE value) {
+void mltable_set(struct table * table, KEY_TYPE key, VALUE_TYPE value) {
 	__set_helper(table, key, value, 0);
 }

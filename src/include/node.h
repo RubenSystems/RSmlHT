@@ -22,7 +22,7 @@ struct node {
 	KEY_TYPE       key;
 	union {
 		VALUE_TYPE value;
-		void *	   pointer;
+		struct table *	   pointer;
 	} data;
 };
 	

@@ -19,15 +19,15 @@ extern "C" {
 #endif
 
 struct mltable {
-	void * root;
+	struct table * root;
 	size_t count;
 };
 
 struct mltable init_mltable(void);
 
-struct node * mltable_get(void *, KEY_TYPE);
+struct node * mltable_get(struct table *, KEY_TYPE);
 
-void mltable_set(void *, KEY_TYPE, VALUE_TYPE);
+void mltable_set(struct table *, KEY_TYPE, VALUE_TYPE);
 
 #ifdef __cplusplus
 }

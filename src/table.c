@@ -12,12 +12,12 @@
 #include <string.h>
 
 
-void * init_table(uint32_t width) {
-
-	void * table_p = calloc(width, sizeof(struct node));
+struct table * init_table(void) {
+	struct table * table_p = calloc(1, sizeof(struct table));
+	// memset(table_p, 0, sizeof(struct table));
 	return table_p;
 }
 
-struct node * get_table_node(void * table, KEY_TYPE key) {
-	return table + (key * sizeof(struct node));
+struct node * get_table_node(struct table * table, KEY_TYPE key) {
+	return table->data + key;
 }
