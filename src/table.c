@@ -11,7 +11,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 struct table * init_table(void) {
 	struct table * table_p = calloc(1, sizeof(struct table));
 	// memset(table_p, 0, sizeof(struct table));

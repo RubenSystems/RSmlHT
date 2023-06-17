@@ -20,7 +20,7 @@ extern "C" {
 
 struct mltable {
 	struct table * root;
-	size_t count;
+	size_t	       count;
 };
 
 struct mltable init_mltable(void);
