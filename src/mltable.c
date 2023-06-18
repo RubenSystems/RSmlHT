@@ -11,8 +11,11 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-struct mltable init_mltable(void) {
-	struct mltable ret = { init_table(), 0 };
+struct mltable init_mltable(struct sc_alloc * allocator) {
+	struct mltable ret;
+	ret.count = 0;
+	ret.root = &allocator->root;
+	ret.allocator = allocator;
 	return ret;
 }
 
@@ -25,23 +28,26 @@ struct node * mltable_get(struct table * table, KEY_TYPE key) {
 	int	      layer = 0;
 
 	while (1) {
+		
 		ret = get_table_node(table, __layer_key(key, layer++));
+		__builtin_prefetch(table);
 		if (ret->type != NODE_POINTER) {
 			break;
 		}
 		table = ret->data.format.value.pointer;
 	};
-
+	
 	return ret;
 }
 
-static bool equatable(KEY_TYPE a, KEY_TYPE b) {
+static inline bool equatable(KEY_TYPE a, KEY_TYPE b) {
 	return a == b;
 }
 
+
 static void __create_until_nonequal(
-	uint64_t key, uint32_t layer, size_t lk1, struct node * current_ret,
-	uint64_t value
+	struct mltable * mltable, uint64_t key, uint32_t layer, size_t lk1,
+	struct node * current_ret, uint64_t value
 ) {
 	KEY_TYPE       replacement_key	 = current_ret->data.format.key;
 	VALUE_TYPE     replacement_value = current_ret->data.format.value.data;
@@ -50,13 +56,14 @@ static void __create_until_nonequal(
 	// layer key for the inserted node == layer key for the current node.
 	do {
 		layer += 1;
-		new_table = init_table();
+		// new_table = init_table();
+		new_table = allocate(mltable->allocator);
 		set_node_pointer(current_ret, 0, new_table);
 		current_ret = get_table_node(
 			new_table, (lk1 = __layer_key(key, layer))
 		);
+		
 	} while (lk1 == (lk2 = __layer_key(replacement_key, layer)));
-
 	set_node_data(current_ret, key, value);
 
 	struct node * fl_current = get_table_node(new_table, lk2);
@@ -64,11 +71,12 @@ static void __create_until_nonequal(
 }
 
 static void __set_helper(
-	struct table * table, KEY_TYPE key, VALUE_TYPE value, uint32_t layer
+	struct mltable * mltable, KEY_TYPE key, VALUE_TYPE value, uint32_t layer
 ) {
-	struct node * ret;
-	bool	      selection = true;
-	size_t	      layer_key;
+	struct table * table = mltable->root;
+	struct node *  ret;
+	bool	       selection = true;
+	size_t	       layer_key;
 	while (selection) {
 		ret = get_table_node(
 			table, (layer_key = __layer_key(key, layer))
@@ -84,7 +92,8 @@ static void __set_helper(
 				ret->data.format.value.data = value;
 			} else {
 				__create_until_nonequal(
-					key, layer, layer_key, ret, value
+					mltable, key, layer, layer_key, ret,
+					value
 				);
 			}
 			selection = false;
@@ -94,13 +103,14 @@ static void __set_helper(
 			layer++;
 		} break;
 		default: {
-			printf("SOMETHING IS BROKEN!\n");
+			printf("[TABLE] - broken layer: %i | mapping %llu -> %llu \n",
+			       layer, key, value);
 			exit(-1);
 		}
 		}
 	}
 }
 
-void mltable_set(struct table * table, KEY_TYPE key, VALUE_TYPE value) {
-	__set_helper(table, key, value, 0);
+void mltable_set(struct mltable * mltable, KEY_TYPE key, VALUE_TYPE value) {
+	__set_helper(mltable, key, value, 0);
 }

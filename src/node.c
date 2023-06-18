@@ -6,10 +6,13 @@
 //
 
 #include <stdio.h>
-#include <arm_neon.h>
+
 #include "include/node.h"
 
+
+
 #if ARM
+#include <arm_neon.h>
 static void
 __mov2_64(const DATA_TYPE * key, const DATA_TYPE * value, DATA_TYPE * dest) {
 	int64x1_t data1		= vld1_u64(key);

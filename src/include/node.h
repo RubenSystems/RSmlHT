@@ -15,7 +15,12 @@
 extern "C" {
 #endif
 
-enum node_type { NODE_NOTHING = 0, NODE_DATA = 1, NODE_POINTER = 2 };
+enum node_type {
+	NODE_NOTHING = 0,
+	NODE_DATA    = 1,
+	NODE_POINTER = 2,
+	NODE_OWNER   = 3 // if the node ownes the chunk
+};
 
 struct node {
 	enum node_type type;

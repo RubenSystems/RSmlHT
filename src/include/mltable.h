@@ -13,21 +13,23 @@
 #include "config.h"
 #include "table.h"
 #include "node.h"
+#include "sc_allocator.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 struct mltable {
-	struct table * root;
-	size_t	       count;
+	struct table *	root;
+	size_t		count;
+	struct sc_alloc * allocator;
 };
 
-struct mltable init_mltable(void);
+struct mltable init_mltable(struct sc_alloc *);
 
 struct node * mltable_get(struct table *, KEY_TYPE);
 
-void mltable_set(struct table *, KEY_TYPE, VALUE_TYPE);
+void mltable_set(struct mltable *, KEY_TYPE, VALUE_TYPE);
 
 #ifdef __cplusplus
 }

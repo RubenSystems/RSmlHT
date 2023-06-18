@@ -20,7 +20,7 @@ struct table {
 	struct node data[TABLE_SIZE(TABLE_WIDTH)];
 };
 
-struct table * init_table(void);
+// struct table * init_table(void);
 
 struct node * get_table_node(struct table *, KEY_TYPE);
 
