@@ -12,7 +12,6 @@
 
 #define CHUNK_SIZE 128
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -37,5 +36,4 @@ struct table * allocate(struct sc_alloc *);
 }
 #endif
 
-	
 #endif /* sc_allocator_h */

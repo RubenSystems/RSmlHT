@@ -20,8 +20,8 @@ extern "C" {
 #endif
 
 struct mltable {
-	struct table *	root;
-	size_t		count;
+	struct table *	  root;
+	size_t		  count;
 	struct sc_alloc * allocator;
 };
 

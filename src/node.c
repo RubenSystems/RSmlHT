@@ -9,8 +9,6 @@
 
 #include "include/node.h"
 
-
-
 #if ARM
 #include <arm_neon.h>
 static void

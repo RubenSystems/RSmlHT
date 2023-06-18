@@ -13,8 +13,8 @@
 
 struct mltable init_mltable(struct sc_alloc * allocator) {
 	struct mltable ret;
-	ret.count = 0;
-	ret.root = &allocator->root;
+	ret.count     = 0;
+	ret.root      = &allocator->root;
 	ret.allocator = allocator;
 	return ret;
 }
@@ -28,7 +28,6 @@ struct node * mltable_get(struct table * table, KEY_TYPE key) {
 	int	      layer = 0;
 
 	while (1) {
-		
 		ret = get_table_node(table, __layer_key(key, layer++));
 		__builtin_prefetch(table);
 		if (ret->type != NODE_POINTER) {
@@ -36,14 +35,13 @@ struct node * mltable_get(struct table * table, KEY_TYPE key) {
 		}
 		table = ret->data.format.value.pointer;
 	};
-	
+
 	return ret;
 }
 
 static inline bool equatable(KEY_TYPE a, KEY_TYPE b) {
 	return a == b;
 }
-
 
 static void __create_until_nonequal(
 	struct mltable * mltable, uint64_t key, uint32_t layer, size_t lk1,
@@ -62,7 +60,7 @@ static void __create_until_nonequal(
 		current_ret = get_table_node(
 			new_table, (lk1 = __layer_key(key, layer))
 		);
-		
+
 	} while (lk1 == (lk2 = __layer_key(replacement_key, layer)));
 	set_node_data(current_ret, key, value);
 
