@@ -8,7 +8,7 @@ CPPFLAGS = -std=c++17  -O3 -Wall -march=native
 TARGET = main 
 TESTING_TARGET = testing
 
-all: main testing
+all: testing
 
 main: $(OBJS)
 	$(CC) $(FLAGS) main.c -o $(TARGET) $(OBJS)

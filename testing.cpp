@@ -33,7 +33,8 @@ struct NoHash {
 
 int main() {
 	printf("TABLE_SIZE: %lu %lu %lu\n", sizeof(struct table), sizeof(struct node), sysconf(_SC_PAGE_SIZE));
-	std::chrono::steady_clock::time_point t1, t2;
+	auto t1 = high_resolution_clock::now();
+	auto t2 = high_resolution_clock::now();
 	auto ms_int = duration_cast<MEASUREMENT>(t2 - t1);
 	
 	struct sc_alloc allocator = init_allocator();
