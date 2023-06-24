@@ -29,7 +29,6 @@ struct node * mltable_get(struct table * table, KEY_TYPE key) {
 
 	while (1) {
 		ret = get_table_node(table, __layer_key(key, layer++));
-		__builtin_prefetch(table);
 		if (ret->type != NODE_POINTER) {
 			break;
 		}
