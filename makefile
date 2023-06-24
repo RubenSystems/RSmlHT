@@ -1,5 +1,5 @@
-CC = clang
-CPP = clang++
+CC = gcc
+CPP = g++
 SRCS = $(shell find ./src -name "*.c")
 HDRS = $(shell find ./src/include -name "*.h")
 OBJS = $(patsubst %.c, %.o, $(SRCS))
