@@ -23,8 +23,8 @@ struct NoHash {
   }
 };
 
-#define testing_unordered_set 1
-#define testing_unordered_get 1
+#define testing_unordered_set 0
+#define testing_unordered_get 0
 #define testing_mlht_set 1
 #define testing_mlht_get 1
 #define assertations 0
